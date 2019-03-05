@@ -9,7 +9,7 @@ opencv是一个跨平台的计算机视觉库.以BSD许可证授权发行，可�
 3.[howto  conda install opencv ](https://blog.csdn.net/wds2435629591/article/details/78694463)
 4. 验证: conda 下 python进入python3环境,之后import cv2 ,然后 cv2.__version__,显示版本号,表示安装成功.
 
+5. pycharm中配置opencv,方法一:[连接包](https://www.cnblogs.com/zhaopengcheng/p/6139684.html);方法二:[File->settings配置](https://blog.csdn.net/PythonKing/article/details/88173886)
 
-你肯定会问:为什么不直接用python3安装呢? ;
-conda 是 Anaconda 下用于包管理和环境管理的命令行工具，是 pip 和 vitualenv 的组合。安装成功后 conda 会默认加入到环境变量中，因此可直接在命令行窗口运行 
-如果你熟悉 virtualenv，那么上手 conda 非常容易，不熟悉 virtulenv 的也没关系，它提供的命令就几个，非常简单。我们可以利用 conda 的虚拟环境管理功能在 Python2 和 Python3 之间自由切换.
+为什么不直接用python3安装呢? 
+conda 是 Anaconda 下用于包管理和环境管理的命令行工具，是 pip 和 vitualenv 的组合。安装成功后 conda 会默认加入到环境变量中，因此可直接在命令行窗口运行.conda它提供的命令就几个，非常简单。我们可以利用 conda 的虚拟环境管理功能在 Python2 和 Python3 之间自由切换.
