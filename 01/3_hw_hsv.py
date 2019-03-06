@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 # 读取图片
-src = cv2.imread('./opencv-logo.png')
+src = cv2.imread('./hw_03.png')
 
 img = cv2.resize(src, (300, 300))
 # 显示原图
