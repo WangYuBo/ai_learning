@@ -23,6 +23,5 @@ h, w = img.shape[:2]
 res_img = cv2.resize(img, (w/2, h/2))
 cv2.imshow('res_img', res_img)
 
-cv2.cvtColor(img, )
 
 cv2.waitKey(0)
