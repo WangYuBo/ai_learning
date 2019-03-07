@@ -2,6 +2,11 @@
 import cv2
 import numpy as np
 
+"""
+作业总结:
+卷积核为(3,3),中值为3时,观察lena睫毛及眼睛,图形形态学先开后闭,图形图像学最清晰,中值比高斯清晰,均值最模糊.
+"""
+
 # 卷积核大小
 ksize = (3, 3)
 
@@ -29,13 +34,11 @@ cv2.imshow('高斯滤波处理的图像', g_img)
 
 # 使用图像图形学处理
 a_img = cv2.morphologyEx(src, cv2.MORPH_OPEN, ksize, 1)
-b_img = cv2.morphologyEx(src, cv2.MORPH_CLOSE, ksize, 1)
+b_img = cv2.morphologyEx(a_img, cv2.MORPH_CLOSE, ksize, 1)
 
-cv2.imshow('图形形态学', b_img)
+cv2.imshow('图形形态学-open', b_img)
+cv2.imshow('图形形态学-open&clos ', b_img)
 
 cv2.waitKey(0)
 
-"""
-作业总结:
-卷积核为(3,3),中值为3时,观察lena睫毛及眼睛,图形形态学先开后闭,图形图像学最清晰,中值比高斯清晰,均值最模糊.
-"""
+
