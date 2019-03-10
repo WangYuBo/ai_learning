@@ -47,10 +47,64 @@ retVal, t_img = cv2.threshold(c_img, 100, 255, cv2.THRESH_BINARY)
 
 cv2.imshow('t_img', t_img)
 
-# 统计有米粒数量,长宽,面积等信息;
+# TODO 统计有米粒数量,长宽,面积等信息;
+# 统计所有轮廓,统计,返回 contours 定義爲“vector<vector<Point>>contours”，是一個向量，
+# 並且是一個二維向量，向量內每個元素保存了一組由連續的Point點構成的點的集合的向量，每一組Point點集就是一個輪廓。有多少輪廓，向量contours就有多少元素
+con_img, conts, hcy = cv2.findContours(t_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+cv2.imshow('con_img', con_img)
+print '米粒数量', len(conts)
+
+# 给所有米粒画出轮廓
+# d_img = cv2.drawContours(con_img, conts, -1, (0, 0, 255))
+# cv2.imshow('d_img', d_img)
 
 
-# 计算在3sigma之间的米粒数量
+ric = [] # 每个米粒的长度和面积
+area_l = []  # 所有米粒的面积
+arcl_l = []  # 所有米粒的周长
+
+# 计算各米粒面积和周长
+for c in conts:
+    area = cv2.contourArea(c) # 计算每个米粒面积
+    l = cv2.arcLength(c, False) # 计算每个完整的米粒周长
+    ric.append([area, l])
+    area_l.append(area)
+    arcl_l.append(l)
+
+    print '米粒面积 %s, 米粒周长 %s' % (area,l)
+
+# ric[] 第一个值是图形总面积,总周长,不计入均值统计
+del ric[0]
+del area_l[0]  # 删除第一个值,第一个值是大图形总面积,
+del arcl_l[0]  # 同理
+
+area_l.sort()
+arcl_l.sort()
+
+del area_l[len(arcl_l)-1]
+del area_l[len(area_l)-1]
+
+
+# 计算米粒面积和周长的均值
+avg_area = np.mean(area_l)
+avg_arcl = np.mean(arcl_l)
+
+
+# 求米粒面积和周长方差area_l[0]
+var_area = np.var(area_l)
+var_arcl = np.var(arcl_l)
+
+# 米粒标准差
+std_area = np.std(area_l)
+std_arcl = np.std(arcl_l)
+
+print '米粒均长 %s, 面积 %s; \r 周长方差 %s, 面积方差 %s; \r 周长标准差 %s, 面积标准差 %s;' % \
+      (avg_arcl, avg_area, var_arcl, var_area, std_arcl, std_area)
+
+# TODO 给米粒标上矩形和编号
+
+# TODO 计算在3sigma之间的米粒数量
 
 
 cv2.waitKey(0)
