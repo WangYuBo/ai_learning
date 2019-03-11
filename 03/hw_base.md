@@ -1,10 +1,10 @@
 1. 画图解释图像卷积滤波的基本原理,并进一步简述常见图像平滑滤波算法.
 
-![移动卷积核,使得敏感点变平](https://github.com/WangYuBo/ai_learning/blob/master/03/hw_01_01.jpg)
+![移动卷积核,使得敏感点变平](https://github.com/WangYuBo/ai_learning/03/hw_01_01.jpg)
 
 用数学公式简述最方便,
  
- ![数学公式](https://github.com/WangYuBo/ai_learning/blob/master/03/hw_01_02.png)
+ ![数学公式](https://github.com/WangYuBo/ai_learning/03/hw_01_02.png)
 
 f(x,y)是原图像,通过与卷积核g(x,y)进行卷积运算,操作图像中的像素.常见均值滤波/加权平均滤波/中值滤波/高斯滤波/图形图像学滤波.
 如果是给按照卷积核大小,给原图像覆盖范围内像素取均值,就是均值滤波.卷积核中值不一样,比如四邻域/八邻域/九邻域.会影响图像表现.均值滤波处理后图像大小不变.
@@ -43,8 +43,9 @@ g = w0w1(u0 - u1)2
 
 4. 简述Harris算子对角点定义,角点检测基本原理.说明引入角点响应函数意义.
 
-答: Harris 算子定义一个灰度在各个方向上变化幅度最大的点.角点检测就是找到这个点.角点响应函数为:
-![角点响应函数公式](https://github.com/WangYuBo/ai_learning/blob/master/03/hw_03_harris_funtion.png)
+答: Harris 算子定义一个灰度在各个方向上变化幅度最大的点.在平缓区，灰度积分基本不变；在边缘部分，灰度积分只在某一个方向上有较大变化；
+在角点，灰度积分各个方向都有较大变化。角点检测就是利用卷积核检测图像灰度变化，找到这个点.角点响应函数为:
+![角点响应函数公式](https://github.com/WangYuBo/ai_learning/03/hw_03_harris_funtion.png)
 当R < 0时,说明点为边界像素;当R>0时说明点为角点;当R在0附近,说明在平缓区.
 
 5. 简述Hough变换基本原理(参数空间变换/参数空间划分网格统计)

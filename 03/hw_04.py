@@ -64,15 +64,24 @@ ric = [] # 每个米粒的长度和面积
 area_l = []  # 所有米粒的面积
 arcl_l = []  # 所有米粒的周长
 
+rec_img = [];
 # 计算各米粒面积和周长
 for c in conts:
-    area = cv2.contourArea(c) # 计算每个米粒面积
-    l = cv2.arcLength(c, False) # 计算每个完整的米粒周长
+    area = cv2.contourArea(c)  # 计算每个米粒面积
+    l = cv2.arcLength(c, False)  # 计算每个完整的米粒周长
+    if area < 10:  # 过小的可能是噪声，过滤之；
+        continue
     ric.append([area, l])
     area_l.append(area)
     arcl_l.append(l)
 
+    x, y, w, h = cv2.boundingRect(c)
+    # 给每个米粒画上包围矩形
+    cv2.rectangle(con_img, (x, y),  (x+w, y+h), (0, 255, 0))
+
     print '米粒面积 %s, 米粒周长 %s' % (area,l)
+
+cv2.imshow('米粒识别', con_img)
 
 # ric[] 第一个值是图形总面积,总周长,不计入均值统计
 del ric[0]
@@ -102,7 +111,6 @@ std_arcl = np.std(arcl_l)
 print '米粒均长 %s, 面积 %s; \r 周长方差 %s, 面积方差 %s; \r 周长标准差 %s, 面积标准差 %s;' % \
       (avg_arcl, avg_area, var_arcl, var_area, std_arcl, std_area)
 
-# TODO 给米粒标上矩形和编号
 
 # TODO 计算在3sigma之间的米粒数量
 
