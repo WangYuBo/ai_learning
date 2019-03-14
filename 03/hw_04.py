@@ -12,10 +12,10 @@ from matplotlib import pyplot as plt
 ksize = (3, 3)
 
 # 读取图片
-src = cv2.imread('./rice.jpg')
+src = cv2.imread('./rice.png')
 
 # 查看图像,发现有很多噪点
-cv2.imshow('origin img', src)
+# cv2.imshow('原图', src)
 
 # 复制图像
 img = src.copy()
@@ -23,12 +23,19 @@ img = src.copy()
 # 先做灰度处理
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
 
-# 先用高斯滤波,得到清晰图像(danjieguobingbulixiang)
-gs_img = cv2.GaussianBlur(img, ksize, sigmaX=0, sigmaY=0)
 
+#  图形形态学 去噪 效果不错
+# 
+gs_img = cv2.morphologyEx(gray_img, cv2.MORPH_OPEN, (5, 5))
+# gs_img = cv2.morphologyEx(gray_img, cv2.MORPH_CLOSE, (5, 5))
 
-#
-cv2.imshow('gaussian blur', gs_img)
+# 先用高斯滤波,得到清晰图像(jieguobingbulixiang)
+# gs_img = cv2.GaussianBlur(img, ksize, 0)
+
+# 大津算法分割图像
+ret, t_img = cv2.threshold(gs_img, 10, 255, cv2.THRESH_OTSU)
+
+# cv2.imshow('高斯滤波处理图', gs_img)
 
 # sobel
 
@@ -36,52 +43,63 @@ cv2.imshow('gaussian blur', gs_img)
 
 # cv2.imshow('Sobel img', s_img)
 
-# canny
+#  canny 这个参数范围内表现不错，
 # https://blog.csdn.net/on2way/article/details/46812121
 c_img = cv2.Canny(gs_img, 100, 300, True)
-cv2.imshow('g-img', gs_img)
-cv2.imshow('c-img', c_img) # canny suanfa
 
-# 再用大津算法分割图像
-retVal, t_img = cv2.threshold(c_img, 100, 255, cv2.THRESH_BINARY)
 
-cv2.imshow('t_img', t_img)
+# cv2.imshow('canny边缘检测后图', c_img)
 
-# TODO 统计有米粒数量,长宽,面积等信息;
+# 再用大津算法分割图像，测试阈值范围：(0,50)（10,250），（10,200），（10,150），（10,100），（10,50）；（50,250），（50,200），
+# ret, t_img = cv2.threshold(c_img, 10, 300, cv2.THRESH_OTSU)
+
+# 使用自适应阈值分割，效果也不好，同大津算法；自适应阈中，参数thrshhodtype 只能是THRESH_BINARY或THRESH_BINARY_INV,否则报找不到类型错误
+# t_img = cv2.adaptiveThreshold(c_img, 200, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 5, 0)
+
+# 统计米粒数量,长宽,面积等信息;
 # 统计所有轮廓,统计,返回 contours 定義爲“vector<vector<Point>>contours”，是一個向量，
 # 並且是一個二維向量，向量內每個元素保存了一組由連續的Point點構成的點的集合的向量，每一組Point點集就是一個輪廓。有多少輪廓，向量contours就有多少元素
 con_img, conts, hcy = cv2.findContours(t_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-
-cv2.imshow('con_img', con_img)
-print '米粒数量', len(conts)
-
-# 给所有米粒画出轮廓
-# d_img = cv2.drawContours(con_img, conts, -1, (0, 0, 255))
-# cv2.imshow('d_img', d_img)
 
 
 ric = [] # 每个米粒的长度和面积
 area_l = []  # 所有米粒的面积
 arcl_l = []  # 所有米粒的周长
 
-rec_img = [];
-# 计算各米粒面积和周长
+rec_img = []
+
+# 计算各米粒面积和周长,并给米粒圈方框
 for c in conts:
     area = cv2.contourArea(c)  # 计算每个米粒面积
-    l = cv2.arcLength(c, False)  # 计算每个完整的米粒周长
+    l = cv2.arcLength(c, True)  # 计算每个完整的米粒周长
     if area < 10:  # 过小的可能是噪声，过滤之；
         continue
     ric.append([area, l])
     area_l.append(area)
     arcl_l.append(l)
 
+
+    """
+    传入图像轮廓，xy是左上角的点，wh是矩形边框宽度高度
+    """
     x, y, w, h = cv2.boundingRect(c)
     # 给每个米粒画上包围矩形
-    cv2.rectangle(con_img, (x, y),  (x+w, y+h), (0, 255, 0))
+    cv2.rectangle(img, (x, y),  (x+w, y+h), (0, 0, 255))
+
+    # 获得最小的矩形轮廓，可能带旋转角度
+    rect = cv2.minAreaRect(c)
+
+    # 计算最小区域坐标
+    box = cv2.boxPoints(rect)
+
+    # 坐标规范化为整数
+    box = np.int0(box)
+
+    # 画出轮廓
+    cv2.drawContours(img, [box], 0, (0, 0, 255), 1)
 
     print '米粒面积 %s, 米粒周长 %s' % (area,l)
 
-cv2.imshow('米粒识别', con_img)
 
 # ric[] 第一个值是图形总面积,总周长,不计入均值统计
 del ric[0]
@@ -113,6 +131,29 @@ print '米粒均长 %s, 面积 %s; \r 周长方差 %s, 面积方差 %s; \r 周�
 
 
 # TODO 计算在3sigma之间的米粒数量
+are_std_list = [] # 用来存储符合三个标准差之间的米粒的面积
+for ar in area_l:
+    if ar < (avg_area - 3*std_area) or ar > (avg_area + 3*std_area):
+        continue
+
+    are_std_list.append(ar)
+
+# 在3sigma之间米粒数量为：
+# print '在3sigma之间米粒数量为：%s' % len(are_std_list)
+
+# 用matlib显示图像
+imgs = [src, gs_img, c_img, t_img, img] # 用来存储每个步骤处理过后的图片
+# titles = ['原图', '高斯模糊', 'Canny边缘检测', '大津分割', '识别处理并加框'] # 每个图片对应标题
+titles = ['orgin_img', 'noise elimination', 'canny', 'ostu', 'rectangle']
+
+for i in range(len(imgs)):
+    plt.subplot(2, 3, i+1), plt.imshow(imgs[i], 'gray')
+    plt.title(titles[i])
+    plt.xticks([]), plt.yticks([])
+
+# TODO str = '在3sigma之间米粒数量为：%s' % len(are_std_list)
+# plt.text(3, 10, '在3sigma之间米粒数量为：85', size = 10, rotation(30), ha='bottom', )
+plt.show()
 
 
 cv2.waitKey(0)
