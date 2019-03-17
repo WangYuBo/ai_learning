@@ -23,6 +23,8 @@ img = src.copy()
 # 先做灰度处理
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
 
+# cv2.calcHist();
+
 
 #  图形形态学 去噪 效果不错
 # 
@@ -33,7 +35,7 @@ gs_img = cv2.morphologyEx(gray_img, cv2.MORPH_OPEN, (5, 5))
 # gs_img = cv2.GaussianBlur(img, ksize, 0)
 
 # 大津算法分割图像
-ret, t_img = cv2.threshold(gs_img, 10, 255, cv2.THRESH_OTSU)
+ret, t_img = cv2.threshold(gs_img, 80, 255, cv2.THRESH_OTSU)
 
 # cv2.imshow('高斯滤波处理图', gs_img)
 
