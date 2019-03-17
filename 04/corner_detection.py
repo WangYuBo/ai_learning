@@ -17,6 +17,7 @@ img = src.copy()
 gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
 
 """
+Harris算法：
 参数一：mat类图像，且单通道8位或浮点型；
 参数二：blocksize,邻域大小；更多的详细信息在cornerEigenValsAndVecs中有讲到
 参数三：ksize,Sobel算子卷积核大小；
@@ -46,16 +47,48 @@ img[h_dst > 0.01*h_dst.max()] = [0, 0, 255]
 
 """
 SIFT算法
-"""
-sift = cv2.xfeatures2d.SIFT_create()
-kp = sift.detect(gray, None)
+1. 直接灰度图上处理，sift算法检测到很多角点，其中包括非角点误检，噪音误检；
+harris算法检测误检较少；
+但两者正确检测的数量相差不多；
 
+2. 猜测：去除噪点后，sift噪音误检率会下降；
+实际：高斯&形态学去噪后，在处理效果一样差；
+"""
 s_img = img.copy()
 
-s_img = cv2.drawKeypoints(gray, kp, s_img)
+# 高斯去噪 效果不好
+#s_img = cv2.GaussianBlur(s_img, (3, 3), 0)
 
-img_names = ['origin', 'gray', 'harris_img', 'SIFT']
-imgs = [src, gray, img, s_img]
+# 图像形态学去噪，
+s_img = cv2.morphologyEx(s_img, cv2.MORPH_OPEN, (5, 5))
+
+# 这个是静态方法；
+sift = cv2.xfeatures2d.SIFT_create()
+
+# 检测角点
+kp = sift.detect(s_img, None)
+
+# 画出角点
+s_img = cv2.drawKeypoints(s_img, kp, s_img)
+
+
+""""
+ORB算法
+"""
+o_img = src.copy()
+
+orb = cv2.ORB_create()
+
+kp_orb = orb.detect(img)
+
+kp_orb, des = orb.compute(o_img,kp_orb)
+
+o_img = cv2.drawKeypoints(o_img, kp_orb, o_img, color=(0, 255, 0), flags=0)
+
+
+# 展示的图片标题
+img_names = ['origin', 'harris_img', 'SIFT', 'ORB_img']
+imgs = [src, img, s_img, o_img]
 
 for i in range(len(imgs)):
     plt.subplot(2, 3, i+1), plt.imshow(imgs[i], 'gray')
