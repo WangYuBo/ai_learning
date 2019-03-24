@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 实现步骤：
 """
 # 第一步：读取视频
-cap = cv2.VideoCapture('./vtest.avi')
+cap = cv2.VideoCapture(0)
 
 
 # 打开视频
