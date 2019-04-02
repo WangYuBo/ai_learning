@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 实现步骤：
 """
 # 第一步：读取视频
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('vtest.avi')
 
 
 # 打开视频
@@ -32,15 +32,12 @@ mog = cv2.createBackgroundSubtractorMOG2()
 while(True):
     # 第四步：读取视频中图片，并使用高斯模型拟合
     ret, frame = cap.read()
-    #print 'this is ret %s' % ret
-    #print(frame)
-    cv2.imshow('123',frame)
-    cv2.waitKey(0)
+
     # 使用高斯模型拟合，背景分割器，计算前景掩码
     fgmk = mog.apply(frame)
 
     # 第五步： 二值化处理，
-    th = cv2.threshold(fgmk, 244, 255, cv2.THRESH_BINARY)[1]
+    th = cv2.threshold(fgmk, 40, 255, cv2.THRESH_BINARY)[1]
 
     # 第六步：计算图像轮廓
     con_img, conts, hcy = cv2.findContours(fgmk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -62,3 +59,5 @@ while(True):
 # 释放窗口资源
 cap.release()
 cv2.destroyAllWindows()
+
+# TODO 使用LK金字塔算法,并与普通LK算法比较 ;
