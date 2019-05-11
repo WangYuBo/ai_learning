@@ -63,7 +63,7 @@ c_img = cv2.Canny(gs_img, 100, 300, True)
 # 並且是一個二維向量，向量內每個元素保存了一組由連續的Point點構成的點的集合的向量，每一組Point點集就是一個輪廓。有多少輪廓，向量contours就有多少元素
 con_img, conts, hcy = cv2.findContours(t_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-
+f
 ric = [] # 每个米粒的长度和面积
 area_l = []  # 所有米粒的面积
 arcl_l = []  # 所有米粒的周长
