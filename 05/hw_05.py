@@ -16,7 +16,8 @@ from matplotlib import pyplot as plt
 实现步骤：
 """
 # 第一步：读取视频
-cap = cv2.VideoCapture('vtest.avi')
+vdieo_path = 'vtest.avi'
+cap = cv2.VideoCapture(vdieo_path)
 
 
 # 打开视频
@@ -40,7 +41,7 @@ while(True):
     th = cv2.threshold(fgmk, 40, 255, cv2.THRESH_BINARY)[1]
 
     # 第六步：计算图像轮廓
-    con_img, conts, hcy = cv2.findContours(fgmk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    conts,hcy = cv2.findContours(fgmk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for c in conts:
         # 第v七步：判断前景轮廓，画出外接矩阵方格；
